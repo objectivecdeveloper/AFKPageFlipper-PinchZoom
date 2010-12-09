@@ -330,6 +330,63 @@
 	}
 }
 
+// This method will handle the PINCH / ZOOM gesture 
+- (void)pinchZoom:(UIPinchGestureRecognizer *)gestureRecognizer
+{
+    if ([gestureRecognizer state] == UIGestureRecognizerStateBegan || [gestureRecognizer state] == UIGestureRecognizerStateChanged) {
+		
+		if (!zoomActive) {
+			zoomActive = YES;
+			originalTransform = [gestureRecognizer view].transform;
+			
+			UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panMove:)];
+			[panGesture setMaximumNumberOfTouches:2];
+			[panGesture setDelegate:self];
+			[self addGestureRecognizer:panGesture];
+			[panGesture release];
+			
+			//[delegate leavesView:self zoomingCurrentView:[gestureRecognizer scale]];			
+		}
+        [gestureRecognizer view].transform = CGAffineTransformScale([[gestureRecognizer view] transform], [gestureRecognizer scale], [gestureRecognizer scale]);
+		[gestureRecognizer setScale:1];
+    }
+}
+
+// This method will handle the double TAP gesture 
+- (void)doubleTap:(UITapGestureRecognizer *)gestureRecognizer
+{
+	
+	if (zoomActive) {
+        [gestureRecognizer view].transform = originalTransform;
+		
+		[[gestureRecognizer view] setCenter:CGPointMake([gestureRecognizer view].frame.size.width / 2, [gestureRecognizer view].frame.size.height / 2)];
+		
+		zoomActive=NO;
+		panActive = NO;
+		
+		NSArray *registeredGestures = self.gestureRecognizers;
+		
+		for (UIGestureRecognizer *gesture in registeredGestures) {
+			if ([gesture isKindOfClass:[UIPanGestureRecognizer class]] ) {
+				// Let remove the PAN / MOVE gesture recognizer
+				[self removeGestureRecognizer:gesture];
+			}
+		}
+		
+		//[delegate leavesView:self doubleTapCurrentView:nil];		
+		
+	}
+}
+
+// This method will handle the PAN / MOVE gesture 
+- (void)panMove:(UIPanGestureRecognizer *)gestureRecognizer
+{
+    if ([gestureRecognizer state] == UIGestureRecognizerStateBegan || [gestureRecognizer state] == UIGestureRecognizerStateChanged) {
+        CGPoint translation = [gestureRecognizer translationInView:[[gestureRecognizer view] superview]];
+        [[gestureRecognizer view] setCenter:CGPointMake([[gestureRecognizer view] center].x + translation.x, [[gestureRecognizer view] center].y + translation.y)];
+        [gestureRecognizer setTranslation:CGPointZero inView:[[gestureRecognizer view] superview]];
+    }
+}
 
 #pragma mark -
 #pragma mark Touch management
