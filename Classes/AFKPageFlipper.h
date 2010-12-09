@@ -48,6 +48,13 @@ typedef enum {
 	BOOL animating;
 	
 	BOOL disabled;
+
+
+	BOOL zoomActive;
+		CGAffineTransform originalTransform;
+	
+	// We also need to know if we can PAN/MOVE (of course only on ZOOM mode)
+	BOOL panActive;
 }
 
 @property (nonatomic,retain) NSObject <AFKPageFlipperDataSource> *dataSource;
