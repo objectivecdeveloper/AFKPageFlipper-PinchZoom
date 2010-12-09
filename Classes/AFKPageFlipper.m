@@ -534,7 +534,20 @@
 		
         [self addGestureRecognizer:tapRecognizer];
 		[self addGestureRecognizer:panRecognizer];
-    }
+		
+		UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinchZoom:)];
+		[pinchGesture setDelegate:self];
+		[self addGestureRecognizer:pinchGesture];
+		[pinchGesture release];
+		
+		UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+		[tapGesture setNumberOfTapsRequired:2];
+		[tapGesture setDelegate:self];
+		[self addGestureRecognizer:tapGesture];
+		[tapGesture release];
+		
+		
+		    }
     return self;
 }
 
